@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Flask Host Sentinel - Premium hosting test dashboard for Flask applications. Check environment, verify POST requests, and monitor resource metrics.">
+    <title>Flask Host Sentinel | Deployment Tester</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="background-decor radial-1"></div>
+    <div class="background-decor radial-2"></div>
+    
+    <div class="container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-icon">⚡</div>
+                <div class="title-area">
+                    <h1 id="app-title">Flask Host Sentinel</h1>
+                    <p class="tagline">Production Hosting Deployment Verifier</p>
+                </div>
+            </div>
+            <div class="status-indicator">
+                <span class="status-pulse" id="connection-status-pulse"></span>
+                <span class="status-text" id="connection-status-text">Checking server...</span>
+            </div>
+        </header>
+
+        <!-- QUICK TELEMETRY GRID -->
+        <section class="telemetry-bar">
+            <div class="telemetry-card" id="card-uptime">
+                <span class="telemetry-label">Server Uptime</span>
+                <span class="telemetry-value" id="uptime-value">00:00:00</span>
+            </div>
+            <div class="telemetry-card" id="card-latency">
+                <span class="telemetry-label">Network Latency</span>
+                <span class="telemetry-value" id="latency-value">-- ms</span>
+            </div>
+            <div class="telemetry-card" id="card-ip">
+                <span class="telemetry-label">Client IP Address</span>
+                <span class="telemetry-value" id="client-ip-value">Retrieving...</span>
+            </div>
+            <div class="telemetry-card" id="card-time">
+                <span class="telemetry-label">Server Local Time</span>
+                <span class="telemetry-value" id="server-time-value">--:--:--</span>
+            </div>
+        </section>
+
+        <main class="dashboard-grid">
+            <!-- ENVIRONMENT AND STATS CARD -->
+            <div class="grid-col main-panel">
+                <!-- SYSTEM SPECS -->
+                <section class="glass-card" id="system-specs-section">
+                    <h2 class="section-title">🖥️ Server Specifications</h2>
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <span class="spec-label">Operating System</span>
+                            <span class="spec-val" id="spec-os">Loading...</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">OS Kernel/Release</span>
+                            <span class="spec-val" id="spec-release">Loading...</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">CPU Architecture</span>
+                            <span class="spec-val" id="spec-arch">Loading...</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Python Interpreter</span>
+                            <span class="spec-val" id="spec-python">Loading...</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Flask Version</span>
+                            <span class="spec-val" id="spec-flask">Loading...</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Web Gateway Server</span>
+                            <span class="spec-val" id="spec-server">Loading...</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DYNAMIC RESOURCE METRICS -->
+                <section class="glass-card" id="resource-metrics-section">
+                    <h2 class="section-title">📊 Real-Time Server Resources</h2>
+                    <div class="metrics-container">
+                        <div class="metric-progress-wrapper">
+                            <div class="metric-meta">
+                                <span class="metric-name">CPU Load</span>
+                                <span class="metric-percentage" id="cpu-percent">0%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="cpu-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="metric-progress-wrapper">
+                            <div class="metric-meta">
+                                <span class="metric-name">RAM Usage</span>
+                                <span class="metric-percentage" id="ram-percent">0%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="ram-bar" style="width: 0%"></div>
+                            </div>
+                            <div class="metric-subtext" id="ram-usage-text">0.00 GB / 0.00 GB</div>
+                        </div>
+                        <p class="psutil-notice" id="metrics-notice">Metrics powered by <code>psutil</code></p>
+                    </div>
+                </section>
+
+                <!-- ENVIRONMENT VARIABLES & HEADERS -->
+                <section class="glass-card expandable-card" id="details-section">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" id="tab-headers-btn" onclick="switchTab('headers')">HTTP Request Headers</button>
+                        <button class="tab-btn" id="tab-env-btn" onclick="switchTab('env')">Environment Variables</button>
+                    </div>
+                    
+                    <div class="tab-pane active" id="pane-headers">
+                        <p class="tab-description">Headers sent by your browser/CDN/Proxy for the current session.</p>
+                        <div class="code-container">
+                            <pre><code id="headers-code-block">Loading HTTP headers...</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="pane-env">
+                        <p class="tab-description">Application process environment variables. Sensitive data (keys, passwords, tokens) are automatically redacted.</p>
+                        <div class="code-container">
+                            <pre><code id="env-code-block">Loading environment variables...</code></pre>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- INTERACTIVE PLAYGROUND -->
+            <div class="grid-col sidebar-panel">
+                <!-- RUNTIME VERIFICATION -->
+                <section class="glass-card interaction-card" id="api-playground-section">
+                    <h2 class="section-title">🧪 API Request Playground</h2>
+                    <p class="card-instruction">Test server-side processing by sending a JSON payload via POST.</p>
+                    
+                    <form id="post-test-form" onsubmit="handlePostSubmit(event)">
+                        <div class="form-group">
+                            <label for="text-input" class="form-label">Input Text</label>
+                            <input type="text" id="text-input" class="form-control" placeholder="Enter text to process" required value="Hello Host Sentinel">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group flex-2">
+                                <label for="repeat-input" class="form-label">Repeat Count</label>
+                                <input type="number" id="repeat-input" class="form-control" min="1" max="50" value="3">
+                            </div>
+                            <div class="form-group flex-1 checkbox-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="reverse-checkbox" checked>
+                                    <span class="checkmark"></span>
+                                    Reverse Text
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submit-post-btn">
+                            <span class="btn-text">Execute POST Request</span>
+                            <span class="btn-loader" id="post-btn-loader"></span>
+                        </button>
+                    </form>
+
+                    <div class="response-wrapper">
+                        <span class="response-title">API Server Response:</span>
+                        <div class="code-container response-code">
+                            <pre><code id="post-response-block">Submit the form to test.</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- POSTGRES INTERACTIVE TESTER -->
+                <section class="glass-card interaction-card" id="db-tester-section" style="border-color: var(--accent-blue);">
+                    <h2 class="section-title">🗄️ Database Query Verifier</h2>
+                    <p class="card-instruction">Run a read/write test. The server will create a table, insert a test run, and retrieve recent entries.</p>
+                    
+                    <button type="button" class="submit-btn" id="run-db-query-btn" onclick="runDatabaseQueryTest()" style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary) 100%); width: 100%;">
+                        <span class="btn-text">Execute DB Read/Write Test</span>
+                        <span class="btn-loader" id="db-query-loader"></span>
+                    </button>
+
+                    <div class="response-wrapper">
+                        <span class="response-title">Database Query Output:</span>
+                        <div class="code-container response-code" style="max-height: 200px;">
+                            <pre><code id="db-query-response-block">Click the button to test.</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- QUICK ACTIONS -->
+                <section class="glass-card" id="quick-actions-section">
+                    <h2 class="section-title">⚡ Quick Verification Tools</h2>
+                    <div class="actions-buttons-container">
+                        <button class="action-btn" id="latency-test-btn" onclick="measureLatency()">
+                            <span class="action-icon">⏱️</span>
+                            <div class="action-text-wrapper">
+                                <span class="action-title-text">Recalculate Latency</span>
+                                <span class="action-desc-text">Perform a dynamic HTTP ping</span>
+                            </div>
+                        </button>
+
+                        <button class="action-btn" id="reload-info-btn" onclick="fetchServerInfo(true)">
+                            <span class="action-icon">🔄</span>
+                            <div class="action-text-wrapper">
+                                <span class="action-title-text">Refresh Server Info</span>
+                                <span class="action-desc-text">Reload all environment metadata</span>
+                            </div>
+                        </button>
+
+                        <button class="action-btn" id="db-test-btn" onclick="checkDatabase()">
+                            <span class="action-icon">🗄️</span>
+                            <div class="action-text-wrapper">
+                                <span class="action-title-text">Test Database Connection</span>
+                                <span class="action-desc-text" id="db-status-desc">Verify PostgreSQL connectivity</span>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>Flask Host Sentinel &bull; Configured for simple cloud deployment (Render, Heroku, VPS, or Docker)</p>
+            <p class="copyright">&copy; 2026. All Systems Operational.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
